@@ -10,11 +10,12 @@ import org.springframework.data.redis.core.RedisTemplate
 class RedisExamplesApplicationTests {
 
 	@Autowired
-	private lateinit var redisTemplate: RedisTemplate<String, Any>
+	private lateinit var redisTemplate: RedisTemplate<String, String>
 
 	@Test
 	fun contextLoads() {
-		redisTemplate.opsForValue().set("my-key", 55)
+		val randomNumber = (1..500).random()
+		redisTemplate.opsForValue().set("my-key-$randomNumber", randomNumber.toString())
 	}
 
 }
