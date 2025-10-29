@@ -6,16 +6,15 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.RedisTemplate
 
 
-
 @SpringBootTest
 class RedisExamplesApplicationTests {
 
 	@Autowired
-	private lateinit var redisTemplate: RedisTemplate<Any, Any>
+	private lateinit var redisTemplate: RedisTemplate<String, Any>
 
 	@Test
 	fun contextLoads() {
-		redisTemplate.opsForValue().set("key", 55);
+		redisTemplate.opsForValue().set("my-key", 55)
 	}
 
 }

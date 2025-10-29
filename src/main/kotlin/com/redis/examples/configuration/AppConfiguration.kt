@@ -11,6 +11,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.RedisPassword
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration
+import org.springframework.data.redis.core.RedisTemplate
 
 @Configuration
 @EnableConfigurationProperties(RedisProperties::class)
@@ -56,6 +57,13 @@ open class AppConfiguration {
         val factory = LettuceConnectionFactory(clusterConfiguration, clientConfiguration)
         factory.afterPropertiesSet()
         return factory
+    }
+
+    @Bean
+    fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
+        val template = RedisTemplate<String, Any>()
+        template.connectionFactory = redisConnectionFactory
+        return template
     }
 
 }
