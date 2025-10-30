@@ -52,7 +52,6 @@ open class AppConfiguration {
 
     @Bean
     open fun lettuceConnectionFactory(
-        redisProperties: RedisProperties,
         clusterConfiguration: RedisClusterConfiguration,
         clientConfiguration: LettucePoolingClientConfiguration
     ): RedisConnectionFactory {
