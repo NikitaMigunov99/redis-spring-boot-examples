@@ -12,6 +12,8 @@ import org.springframework.data.redis.connection.RedisPassword
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.serializer.StringRedisSerializer
+
 
 @Configuration
 @EnableConfigurationProperties(RedisProperties::class)
@@ -63,6 +65,8 @@ open class AppConfiguration {
     open fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, String> {
         val template = RedisTemplate<String, String>()
         template.connectionFactory = redisConnectionFactory
+        template.keySerializer = StringRedisSerializer()
+        template.valueSerializer = StringRedisSerializer() // For JSON serialization of values
         return template
     }
 

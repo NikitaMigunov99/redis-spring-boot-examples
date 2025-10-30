@@ -15,7 +15,8 @@ class RedisExamplesApplicationTests {
 	@Test
 	fun contextLoads() {
 		val randomNumber = (1..500).random()
-		redisTemplate.opsForValue().set("my-key-$randomNumber", randomNumber.toString())
+		println("Random number is $randomNumber")
+		redisTemplate.opsForValue().set("my:number", randomNumber.toString())
 	}
 
 }
