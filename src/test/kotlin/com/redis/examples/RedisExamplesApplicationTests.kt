@@ -23,6 +23,8 @@ class RedisExamplesApplicationTests {
         redisTemplate.opsForHash<String, Int>().put("my:hash:number:test", field, randomNumber)
         redisTemplate.opsForHash<String, String>().put("my:hash:template:test", "template", HTML_EXAMPLE)
 
+        val myNumberAny = redisTemplate.opsForValue().get("my:number:test")
+        println("My number Object is $myNumberAny")
         val myNumber = redisTemplate.opsForValue().get("my:number:test") as? Int
         println("My number is $myNumber")
         val template = redisTemplate.opsForValue().get("my:template:test") as? String
@@ -32,6 +34,9 @@ class RedisExamplesApplicationTests {
         println("My number is from hash $myNumberHash")
         val templateHash = redisTemplate.opsForHash<String, String>().get("my:hash:template:test", "template")
         println("My template is from hash $templateHash")
+
+        val nullObject = redisTemplate.opsForValue().get("null:test")
+        println("My null Object is $nullObject")
     }
 
     private companion object {
