@@ -25,7 +25,7 @@ class RedisExamplesApplicationTests {
 
         val myNumberAny = redisTemplate.opsForValue().get("my:number:test")
         println("My number Object is $myNumberAny")
-        val myNumber = redisTemplate.opsForValue().get("my:number:test") as? Int
+        val myNumber = redisTemplate.opsForValue().get("my:number:test")?.toString()?.toIntOrNull()
         println("My number is $myNumber")
         val template = redisTemplate.opsForValue().get("my:template:test") as? String
         println("My template is $template")
