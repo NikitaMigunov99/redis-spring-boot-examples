@@ -30,13 +30,36 @@ class RedisExamplesApplicationTests {
         val template = redisTemplate.opsForValue().get("my:template:test") as? String
         println("My template is $template")
 
+        val result = redisTemplate.opsForValue().increment("my:number:test")
+        println("Increment result is $result")
+
+        val myNumberAfterIncrement = redisTemplate.opsForValue().get("my:number:test")?.toString()?.toIntOrNull()
+        println("My number is $myNumberAfterIncrement")
+
         val myNumberHash = redisTemplate.opsForHash<String, Int>().get("my:hash:number:test", field)
+
         println("My number is from hash $myNumberHash")
         val templateHash = redisTemplate.opsForHash<String, String>().get("my:hash:template:test", "template")
         println("My template is from hash $templateHash")
 
         val nullObject = redisTemplate.opsForValue().get("null:test")
         println("My null Object is $nullObject")
+
+        try {
+            println("Try to increment null")
+            val result = redisTemplate.opsForValue().increment("null:test")
+            println("Try to increment null result is $result")
+        } catch (e: Exception) {
+            println("My null Object is not a number")
+        }
+
+        try {
+            println("Try to increment string")
+            val result = redisTemplate.opsForValue().increment("my:template:test")
+            println("Try to increment string result is $result")
+        } catch (e: Exception) {
+            println("My string Object is not a number")
+        }
     }
 
     private companion object {
