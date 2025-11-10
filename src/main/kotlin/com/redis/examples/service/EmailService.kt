@@ -29,7 +29,7 @@ class EmailService(
     }
 
     fun getCounter(domain: String): Int? {
-        return redisTemplate.opsForHash<String, Int>().get(COUNTER_KEY, domain)
+        return redisTemplate.opsForHash<String, String>().get(COUNTER_KEY, domain)?.toIntOrNull()
     }
 
     private fun setAndExpire(domain: String, newValue: Int) {
