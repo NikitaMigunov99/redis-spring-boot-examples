@@ -20,7 +20,7 @@ class RedisExamplesApplicationTests {
         redisTemplate.opsForValue().set("my:template:test", HTML_EXAMPLE)
 
         val field = "key-for-$randomNumber"
-        redisTemplate.opsForHash<String, Int>().put("my:hash:number:test", field, randomNumber)
+        redisTemplate.opsForHash<String, String>().put("my:hash:number:test", field, randomNumber.toString())
         redisTemplate.opsForHash<String, String>().put("my:hash:template:test", "template", HTML_EXAMPLE)
 
         val myNumberAny = redisTemplate.opsForValue().get("my:number:test")
@@ -36,7 +36,7 @@ class RedisExamplesApplicationTests {
         val myNumberAfterIncrement = redisTemplate.opsForValue().get("my:number:test")?.toString()?.toIntOrNull()
         println("My number is $myNumberAfterIncrement")
 
-        val myNumberHash = redisTemplate.opsForHash<String, Int>().get("my:hash:number:test", field)
+        val myNumberHash = redisTemplate.opsForHash<String, String>().get("my:hash:number:test", field)?.toIntOrNull()
 
         println("My number is from hash $myNumberHash")
         val templateHash = redisTemplate.opsForHash<String, String>().get("my:hash:template:test", "template")
