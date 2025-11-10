@@ -41,7 +41,7 @@ class EmailService(
         val script = DefaultRedisScript<Long>(luaScript)
 
         try {
-            val result = redisTemplate.execute(script, listOf(COUNTER_KEY), listOf(domain, newValue.toString()))
+            val result = redisTemplate.execute(script, listOf(COUNTER_KEY), listOf(domain, newValue))
 
             logger.info("Значение увеличено на единицу ($result). Поле теперь актуально ещё 5 секунд.")
         } catch (ex: Exception) {
