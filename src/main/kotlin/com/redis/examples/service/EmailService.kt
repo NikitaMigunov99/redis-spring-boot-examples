@@ -36,7 +36,7 @@ class EmailService(
         val luaScript = """
             redis.call('HSET', KEYS[1], ARGV[1], ARGV[2])
             redis.call('HEXPIRE', KEYS[1], ARGV[1], ARGV[3])
-            return ARGV[2]
+            return tonumber(ARGV[2])
         """.trimIndent()
 
         val script = DefaultRedisScript<Long>(luaScript)
