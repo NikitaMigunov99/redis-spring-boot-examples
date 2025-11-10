@@ -14,11 +14,11 @@ class EmailService(
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun process(domain: String) {
-        val counterOperations = redisTemplate.opsForHash<String, Int>()
-        val counterValue = counterOperations.get(COUNTER_KEY, domain) ?: 0
+        val counterOperations = redisTemplate.opsForHash<String, String>()
+        val counterValue = counterOperations.get(COUNTER_KEY, domain)?.toIntOrNull() ?: 0
 
         if (counterValue > 5) {
-            counterOperations.put(COUNTER_KEY, domain, 0)
+            counterOperations.put(COUNTER_KEY, domain, "0")
             logger.info("Обнулили счётчик для домена $domain.")
             return
         }
