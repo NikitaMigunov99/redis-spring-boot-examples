@@ -35,7 +35,7 @@ class EmailService(
     private fun setAndExpire(domain: String, newValue: Int) {
         val luaScript = """
             redis.call('HSET', KEYS[1], ARGV[1], ARGV[2])
-            redis.call('HEXPIRE', KEYS[1], ARGV[1], ARGV[3])
+            redis.call('HEXPIRE', KEYS[1], ARGV[3], ARGV[1])
             return tonumber(ARGV[2])
         """.trimIndent()
 
