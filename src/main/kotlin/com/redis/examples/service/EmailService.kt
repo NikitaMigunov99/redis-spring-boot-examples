@@ -1,10 +1,11 @@
 package com.redis.examples.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.data.redis.connection.RedisConnection
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.stereotype.Service
 import java.lang.Thread.sleep
+
 
 @Service
 class EmailService(
@@ -33,23 +34,43 @@ class EmailService(
     }
 
     private fun setAndExpire(domain: String, newValue: Int) {
-        val luaScript = """
-            redis.call('HSET', KEYS[1], ARGV[1], ARGV[2])
-            redis.call('HEXPIRE', KEYS[1], ARGV[3], ARGV[1])
-            return tonumber(ARGV[2])
-        """.trimIndent()
-
-        val script = DefaultRedisScript<Int>(luaScript)
-
         try {
-            logger.info("Выполняем скрипт для увеличения счётчика для домена $domain c новым значением $newValue.")
-            val result = redisTemplate.execute(script, listOf(COUNTER_KEY), domain, newValue, 5)
+            logger.info("Выполняем обновление счётчика для домена $domain c новым значением $newValue.")
+            redisTemplate.opsForHash<String, String>().put(COUNTER_KEY, domain, newValue.toString())
+            logger.info("Выполняем установку времени жизни для домена $domain.")
+            redisTemplate.execute { connection: RedisConnection ->
+                // HEXPIRE key field seconds
+                val rawKey = redisTemplate.stringSerializer.serialize(COUNTER_KEY)
+                val rawField = redisTemplate.stringSerializer.serialize(domain)
 
-            logger.info("Значение увеличено с результатом ($result)")
+                // Build raw command
+                connection.execute("HEXPIRE", rawKey, rawField, "5".toByteArray())
+                null
+            }
         } catch (ex: Exception) {
-            logger.error("Ошибка при выполнении скрипта", ex)
+            logger.error("Ошибка при выполнении обновления счётчика", ex)
         }
+
     }
+
+//    private fun setAndExpire(domain: String, newValue: Int) {
+//        val luaScript = """
+//            redis.call('HSET', KEYS[1], ARGV[1], ARGV[2])
+//            redis.call('HEXPIRE', KEYS[1], ARGV[3], ARGV[1])
+//            return tonumber(ARGV[2])
+//        """.trimIndent()
+//
+//        val script = DefaultRedisScript<Int>(luaScript)
+//
+//        try {
+//            logger.info("Выполняем скрипт для увеличения счётчика для домена $domain c новым значением $newValue.")
+//            val result = redisTemplate.execute(script, listOf(COUNTER_KEY), domain, newValue, 5)
+//
+//            logger.info("Значение увеличено с результатом ($result)")
+//        } catch (ex: Exception) {
+//            logger.error("Ошибка при выполнении скрипта", ex)
+//        }
+//    }
 
     companion object {
         const val COUNTER_KEY = "email:counters"
