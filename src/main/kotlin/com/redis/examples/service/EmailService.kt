@@ -34,17 +34,18 @@ class EmailService(
 
     private fun setAndExpire(domain: String, newValue: Int) {
         val luaScript = """
-            redis.call('HSET', KEYS[1], ARGV[1], ARGV[1])
-            return 'Hello'
+            redis.call('HSET', KEYS[1], ARGV[1], ARGV[2])
+            redis.call('HEXPIRE', KEYS[1], ARGV[1], ARGV[3])
+            return tonumber(ARGV[2])
         """.trimIndent()
 
-        val script = DefaultRedisScript<String>(luaScript)
+        val script = DefaultRedisScript<Int>(luaScript)
 
         try {
             logger.info("Выполняем скрипт для увеличения счётчика для домена $domain c новым значением $newValue.")
-            val result = redisTemplate.execute(script, listOf(COUNTER_KEY), listOf(domain, newValue))
+            val result = redisTemplate.execute(script, listOf(COUNTER_KEY), domain, newValue, 5)
 
-            logger.info("Значение увеличено с результатом ($result). Поле теперь актуально ещё 5 секунд.")
+            logger.info("Значение увеличено с результатом ($result)")
         } catch (ex: Exception) {
             logger.error("Ошибка при выполнении скрипта", ex)
         }
