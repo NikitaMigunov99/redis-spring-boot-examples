@@ -23,7 +23,7 @@ class EmailService(
             return
         }
 
-        sleep(5_000L)
+        sleep(1_000L)
 
         setAndExpire(domain, counterValue + 1)
     }

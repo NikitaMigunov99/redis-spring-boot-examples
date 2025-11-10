@@ -67,6 +67,9 @@ open class AppConfiguration {
         template.connectionFactory = redisConnectionFactory
         template.keySerializer = StringRedisSerializer()
         template.valueSerializer = GenericToStringSerializer(Any::class.java)
+
+        template.hashKeySerializer = StringRedisSerializer()
+        template.hashValueSerializer = GenericToStringSerializer(Any::class.java)
         return template
     }
 
