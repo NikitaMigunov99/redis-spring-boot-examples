@@ -70,6 +70,7 @@ open class AppConfiguration {
 
         template.hashKeySerializer = StringRedisSerializer()
         template.hashValueSerializer = GenericToStringSerializer(Any::class.java)
+        template.afterPropertiesSet()
         return template
     }
 
