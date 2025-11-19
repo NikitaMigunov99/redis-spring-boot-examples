@@ -21,6 +21,7 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.GenericToStringSerializer
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
 
@@ -44,11 +45,13 @@ open class AppConfiguration {
         val template = RedisTemplate<String, User>()
         template.connectionFactory = redisConnectionFactory
 
+        val serializer = Jackson2JsonRedisSerializer(User::class.java)
+
         template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = GenericJackson2JsonRedisSerializer() // Сериализуем объекты в JSON
+        template.valueSerializer = serializer // Сериализуем объекты в JSON
 
         template.hashKeySerializer = StringRedisSerializer()
-        template.hashValueSerializer = GenericJackson2JsonRedisSerializer()
+        template.hashValueSerializer = serializer
 
         template.afterPropertiesSet()
         return template
