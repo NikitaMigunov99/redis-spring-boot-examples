@@ -45,12 +45,15 @@ class RedisExamplesApplicationTests {
         val nullObject = redisTemplate.opsForValue().get("null:test")
         println("My null Object is $nullObject")
 
+        val nullHash = redisTemplate.opsForHash<String, String>().get("my:null:hash", "my:hash")
+        println("My null from hash $nullHash")
+
         try {
             println("Try to increment null")
             val result = redisTemplate.opsForValue().increment("null:test")
             println("Try to increment null result is $result")
         } catch (e: Exception) {
-            println("My null Object is not a number")
+            println("My null Object is not a number: $e")
         }
 
         try {
