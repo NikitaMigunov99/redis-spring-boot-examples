@@ -24,7 +24,7 @@ open class AppConfiguration {
 
     @Bean
     open fun updateAndSetTTL(): RedisScript<Int> {
-        val scriptSource = ClassPathResource("scripts/script-for-one-field.lua")
+        val scriptSource = ClassPathResource("script/script-for-one-field.lua")
         return RedisScript.of(scriptSource, Int::class.java) // Specify return type
     }
 
