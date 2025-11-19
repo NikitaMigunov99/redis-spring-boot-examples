@@ -1,6 +1,8 @@
 package com.redis.examples.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator
 import io.lettuce.core.ClientOptions
 import io.lettuce.core.resource.ClientResources
 import io.lettuce.core.resource.DefaultClientResources
@@ -26,7 +28,15 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 open class AppConfiguration {
 
     @Bean
-    open fun objectMapper(): ObjectMapper = ObjectMapper()
+    open fun objectMapper(): ObjectMapper {
+        val validator: PolymorphicTypeValidator = BasicPolymorphicTypeValidator.builder()
+            .allowIfSubType("com.redis.examples.models.User") // Укажите полный путь
+            .build()
+
+        return ObjectMapper().apply {
+            activateDefaultTyping(validator, ObjectMapper.DefaultTyping.NON_FINAL)
+        }
+    }
 
     @Bean(name = ["redisTemplateForUsers"])
     open fun redisTemplateForUsers(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
