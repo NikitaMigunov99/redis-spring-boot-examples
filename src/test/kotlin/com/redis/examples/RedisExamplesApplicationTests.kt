@@ -61,7 +61,7 @@ class RedisExamplesApplicationTests {
             val result = redisTemplate.opsForValue().increment("my:template:test")
             println("Try to increment string result is $result")
         } catch (e: Exception) {
-            println("My string Object is not a number")
+            println("My string Object is not a number: $e")
         }
     }
 
