@@ -1,11 +1,13 @@
 package com.redis.examples.configuration
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.lettuce.core.ClientOptions
 import io.lettuce.core.resource.ClientResources
 import io.lettuce.core.resource.DefaultClientResources
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.redis.connection.RedisClusterConfiguration
 import org.springframework.data.redis.connection.RedisConnectionFactory
@@ -14,6 +16,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.GenericToStringSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
@@ -21,6 +24,40 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 @Configuration
 @EnableConfigurationProperties(RedisProperties::class)
 open class AppConfiguration {
+
+    @Bean
+    open fun objectMapper(): ObjectMapper = ObjectMapper()
+
+    @Bean(name = ["redisTemplateForUsers"])
+    open fun redisTemplateForUsers(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
+        val template = RedisTemplate<String, Any>()
+        template.connectionFactory = redisConnectionFactory
+
+        template.keySerializer = StringRedisSerializer()
+        template.valueSerializer = GenericJackson2JsonRedisSerializer() // Сериализуем объекты в JSON
+
+        template.hashKeySerializer = StringRedisSerializer()
+        template.hashValueSerializer = GenericJackson2JsonRedisSerializer()
+
+        template.afterPropertiesSet()
+        return template
+    }
+
+    @Bean
+    @Primary
+    open fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
+        val template = RedisTemplate<String, Any>()
+        template.connectionFactory = redisConnectionFactory
+
+        template.keySerializer = StringRedisSerializer()
+        template.valueSerializer = GenericToStringSerializer(Any::class.java)
+
+        template.hashKeySerializer = StringRedisSerializer()
+        template.hashValueSerializer = GenericToStringSerializer(Any::class.java)
+
+        template.afterPropertiesSet()
+        return template
+    }
 
     @Bean
     open fun updateAndSetTTL(): RedisScript<String> {
@@ -67,19 +104,6 @@ open class AppConfiguration {
         val factory = LettuceConnectionFactory(clusterConfiguration, clientConfiguration)
         factory.afterPropertiesSet()
         return factory
-    }
-
-    @Bean
-    open fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
-        val template = RedisTemplate<String, Any>()
-        template.connectionFactory = redisConnectionFactory
-        template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = GenericToStringSerializer(Any::class.java)
-
-        template.hashKeySerializer = StringRedisSerializer()
-        template.hashValueSerializer = GenericToStringSerializer(Any::class.java)
-        template.afterPropertiesSet()
-        return template
     }
 
 }
