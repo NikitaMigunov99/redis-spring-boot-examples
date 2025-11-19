@@ -17,12 +17,12 @@ class EmailService(
         val counterValue = countersApi.getCounter(domain) ?: 0
 
         if (counterValue > 5) {
-            countersApi.setValue(domain, 0)
+            countersApi.setAndExpire(domain, 0)
             logger.info("Обнулили счётчик для домена $domain.")
             return
         }
 
-        sleep(1_000L)
+        sleep(3_500L)
 
         countersApi.setAndExpire(domain, counterValue + 1)
     }

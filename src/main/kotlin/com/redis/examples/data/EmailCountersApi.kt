@@ -24,7 +24,7 @@ open class EmailCountersApi(
     fun setAndExpire(domain: String, newValue: Int) {
         try {
             logger.info("Выполняем скрипт для увеличения счётчика для домена $domain c новым значением $newValue c временем жизни 5 сек.")
-            val result = redisTemplate.execute(script, listOf(COUNTER_KEY), domain, newValue, 5)
+            val result = redisTemplate.execute(script, listOf(COUNTER_KEY), domain, newValue, 15)
 
             logger.info("Значение увеличено с результатом ($result)")
         } catch (ex: Exception) {
