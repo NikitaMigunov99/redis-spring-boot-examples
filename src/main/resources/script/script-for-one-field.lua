@@ -1,9 +1,3 @@
-local key     = KEYS[1]
-local seconds = tonumber(ARGV[1])
-local field   = ARGV[2]
-
--- Execute HEXPIRE with a single field
--- Equivalent to: HEXPIRE key seconds FIELDS 1 field
-local result = redis.call("HEXPIRE", key, seconds, "FIELDS", 1, field)
-
-return result
+redis.call('HSET', KEYS[1], ARGV[1], ARGV[2])
+redis.call('HEXPIRE', KEYS[1], ARGV[3], 'FIELDS', 1, ARGV[1])
+return tonumber(ARGV[2])
