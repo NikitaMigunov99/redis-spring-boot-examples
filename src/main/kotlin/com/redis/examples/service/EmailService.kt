@@ -22,7 +22,7 @@ class EmailService(
             return
         }
 
-        sleep(3_500L)
+        sleep(1_500L)
 
         countersApi.setAndExpire(domain, counterValue + 1)
     }
