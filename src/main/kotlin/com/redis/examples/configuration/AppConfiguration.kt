@@ -6,12 +6,14 @@ import io.lettuce.core.resource.DefaultClientResources
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.io.ClassPathResource
 import org.springframework.data.redis.connection.RedisClusterConfiguration
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.RedisPassword
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.data.redis.serializer.GenericToStringSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
@@ -19,6 +21,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 @Configuration
 @EnableConfigurationProperties(RedisProperties::class)
 open class AppConfiguration {
+
+    @Bean
+    open fun updateAndSetTTL(): RedisScript<Int> {
+        val scriptSource = ClassPathResource("scripts/script-for-one-field.lua")
+        return RedisScript.of(scriptSource, Int::class.java) // Specify return type
+    }
 
     @Bean
     open fun clientResources(): ClientResources = DefaultClientResources.create()
