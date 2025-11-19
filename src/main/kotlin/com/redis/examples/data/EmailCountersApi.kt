@@ -14,20 +14,11 @@ open class EmailCountersApi(
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun getCounter(domain: String): Int? {
-        try {
-            return redisTemplate.opsForHash<String, Int>().get(COUNTER_KEY, domain)
-        } catch (ex: Exception) {
-            logger.error("Ошибка при получении значения", ex)
-            return null
-        }
+        return redisTemplate.opsForHash<String, String>().get(COUNTER_KEY, domain)?.toIntOrNull()
     }
 
     fun setValue(domain: String, newValue: Int) {
-        try {
-            redisTemplate.opsForHash<String, Int>().put(COUNTER_KEY, domain, newValue)
-        } catch (ex: Exception) {
-            logger.error("Ошибка при установке значения", ex)
-        }
+        redisTemplate.opsForHash<String, String>().put(COUNTER_KEY, domain, newValue.toString())
     }
 
     fun setAndExpire(domain: String, newValue: Int) {
