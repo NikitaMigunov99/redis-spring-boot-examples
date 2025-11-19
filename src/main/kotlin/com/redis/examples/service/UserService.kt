@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 
 @Service
-class UserService(@Qualifier("redisTemplateForUsers") private val userRedisTemplate: RedisTemplate<String, Any>) {
+class UserService(@Qualifier("redisTemplateForUsers") private val userRedisTemplate: RedisTemplate<String, User>) {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 

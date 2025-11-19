@@ -1,10 +1,9 @@
 package com.redis.examples.configuration
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
+import com.redis.examples.models.User
 import io.lettuce.core.ClientOptions
 import io.lettuce.core.resource.ClientResources
 import io.lettuce.core.resource.DefaultClientResources
@@ -22,7 +21,6 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.GenericToStringSerializer
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
 
@@ -42,25 +40,15 @@ open class AppConfiguration {
     }
 
     @Bean(name = ["redisTemplateForUsers"])
-    open fun redisTemplateForUsers(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
-        val template = RedisTemplate<String, Any>()
+    open fun redisTemplateForUsers(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, User> {
+        val template = RedisTemplate<String, User>()
         template.connectionFactory = redisConnectionFactory
 
-        val mapper = ObjectMapper()
-        mapper.activateDefaultTyping(
-            LaissezFaireSubTypeValidator(),
-            ObjectMapper.DefaultTyping.NON_FINAL,
-            JsonTypeInfo.As.PROPERTY
-        )
-
-        val serializer = Jackson2JsonRedisSerializer(Any::class.java)
-        serializer.setObjectMapper(mapper)
-
         template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = serializer // Сериализуем объекты в JSON
+        template.valueSerializer = GenericJackson2JsonRedisSerializer() // Сериализуем объекты в JSON
 
         template.hashKeySerializer = StringRedisSerializer()
-        template.hashValueSerializer = serializer
+        template.hashValueSerializer = GenericJackson2JsonRedisSerializer()
 
         template.afterPropertiesSet()
         return template
