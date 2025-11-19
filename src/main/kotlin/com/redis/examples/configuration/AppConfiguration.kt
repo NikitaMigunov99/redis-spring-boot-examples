@@ -1,8 +1,10 @@
 package com.redis.examples.configuration
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import io.lettuce.core.ClientOptions
 import io.lettuce.core.resource.ClientResources
 import io.lettuce.core.resource.DefaultClientResources
@@ -20,6 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.GenericToStringSerializer
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
 
@@ -27,7 +30,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 @EnableConfigurationProperties(RedisProperties::class)
 open class AppConfiguration {
 
-    @Bean
+    //@Bean
     open fun objectMapper(): ObjectMapper {
         val validator: PolymorphicTypeValidator = BasicPolymorphicTypeValidator.builder()
             .allowIfSubType("com.redis.examples.models.User") // Укажите полный путь
@@ -43,11 +46,21 @@ open class AppConfiguration {
         val template = RedisTemplate<String, Any>()
         template.connectionFactory = redisConnectionFactory
 
+        val mapper = ObjectMapper()
+        mapper.activateDefaultTyping(
+            LaissezFaireSubTypeValidator(),
+            ObjectMapper.DefaultTyping.NON_FINAL,
+            JsonTypeInfo.As.PROPERTY
+        )
+
+        val serializer = Jackson2JsonRedisSerializer(Any::class.java)
+        serializer.setObjectMapper(mapper)
+
         template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = GenericJackson2JsonRedisSerializer() // Сериализуем объекты в JSON
+        template.valueSerializer = serializer // Сериализуем объекты в JSON
 
         template.hashKeySerializer = StringRedisSerializer()
-        template.hashValueSerializer = GenericJackson2JsonRedisSerializer()
+        template.hashValueSerializer = serializer
 
         template.afterPropertiesSet()
         return template
