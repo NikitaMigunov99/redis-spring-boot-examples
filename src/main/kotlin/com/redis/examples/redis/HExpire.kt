@@ -10,4 +10,6 @@ class HExpire : ProtocolKeyword {
     override fun getBytes(): ByteArray = bytes
 
     override fun name(): String = expire
+
+    override fun toString(): String = expire
 }
