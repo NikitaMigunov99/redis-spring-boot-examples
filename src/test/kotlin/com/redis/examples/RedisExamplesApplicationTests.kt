@@ -13,7 +13,7 @@ class RedisExamplesApplicationTests {
     private lateinit var redisTemplate: RedisTemplate<String, Any>
 
     @Test
-    fun contextLoads() {
+    fun testTemplate() {
         val randomNumber = (1..500).random()
         println("Random number is $randomNumber")
         redisTemplate.opsForValue().set("my:number:test", randomNumber)
@@ -64,6 +64,9 @@ class RedisExamplesApplicationTests {
             println("My string Object is not a number: $e")
         }
     }
+
+    @Test
+    fun contextLoads() {}
 
     private companion object {
         const val HTML_EXAMPLE = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Простая страница</title></head><body><h1>Привет!</h1><p>Это простая HTML-страничка.</p></body></html>"
