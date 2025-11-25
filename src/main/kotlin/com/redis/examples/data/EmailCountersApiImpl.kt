@@ -10,6 +10,9 @@ import org.springframework.data.redis.connection.lettuce.LettuceClusterConnectio
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
+import java.util.concurrent.CompletableFuture
+
+
 
 @Component
 @Primary
@@ -41,12 +44,18 @@ class EmailCountersApiImpl(
             logger.info("My native connection:$nativeConnection")
             nativeConnection.setAutoFlushCommands(false)
 
-            nativeConnection.hset(keyByteArray, domain.toByteArray(), newValue.toString().toByteArray())
+            val hsetResult = nativeConnection.hset(keyByteArray, domain.toByteArray(), newValue.toString().toByteArray())
 
             val args = commandArgsFactory.createCommand(keyByteArray, domain, 30)
-            nativeConnection.dispatch(hExpire, ByteArrayOutput(ByteArrayCodec.INSTANCE), args)
+            val hexpireResult = nativeConnection.dispatch(hExpire, ByteArrayOutput(ByteArrayCodec.INSTANCE), args)
+
 
             nativeConnection.flushCommands()
+
+
+            logger.info("Ждем завершения pipeline с командами HSET и HEXPIRE")
+            logger.info("Результат HSET: " + hsetResult.await(30, java.util.concurrent.TimeUnit.SECONDS))
+            logger.info("Результат HEXPIRE: " + hexpireResult.await(30, java.util.concurrent.TimeUnit.SECONDS))
             logger.info("Завершили pipeline с командами HSET и HEXPIRE")
         } catch (e: Exception) {
             logger.error("Ошибка при выполнении команд Redis", e)
