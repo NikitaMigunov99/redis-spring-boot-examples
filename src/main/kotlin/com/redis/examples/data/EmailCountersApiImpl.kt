@@ -38,9 +38,7 @@ class EmailCountersApiImpl(
         try {
             logger.info("Запускаем pipeline с командами HSET и HEXPIRE")
             val connection = connectionFactory.getClusterConnection() as LettuceClusterConnection
-            logger.info("My connection:$connection")
             val nativeConnection = connection.getNativeConnection()
-            logger.info("My native connection:$nativeConnection")
             nativeConnection.setAutoFlushCommands(false)
 
             val hsetResult = nativeConnection.hset(keyByteArray, domain.toByteArray(), newValue.toString().toByteArray())
@@ -56,8 +54,8 @@ class EmailCountersApiImpl(
 //            logger.info("Результат HSET: " + hsetResult.await(30, java.util.concurrent.TimeUnit.SECONDS))
 //            logger.info("Результат HEXPIRE: " + hexpireResult.await(30, java.util.concurrent.TimeUnit.SECONDS))
 
-            processRedisFutureSync(hsetResult, ERROR_HSET_MESSAGE)
-            processRedisFutureSync(hexpireResult, ERROR_HEXPIRE_MESSAGE)
+            processRedisFutureSync(hsetResult)
+            processRedisFutureForExpirationSync(hexpireResult)
 
             logger.info("Завершили pipeline с командами HSET и HEXPIRE")
             logger.info("Результат при выполнении HEXPIRE: " + hexpireResult.get().decodeToString())
@@ -66,11 +64,22 @@ class EmailCountersApiImpl(
         }
     }
 
-    private fun processRedisFutureSync(future: RedisFuture<*>, message: String) {
+    private fun processRedisFutureSync(future: RedisFuture<*>) {
         try {
             future.get(30, java.util.concurrent.TimeUnit.SECONDS)
         } catch (e: Exception) {
-            logger.error(message, e)
+            logger.error(ERROR_HSET_MESSAGE, e)
+        }
+    }
+
+    private fun processRedisFutureForExpirationSync(future: RedisFuture<ByteArray>) {
+        try {
+            val result = future.get(30, java.util.concurrent.TimeUnit.SECONDS).decodeToString()
+            if (ONE != result) {
+                logger.error("The expiration time was not set/updated. Result: $result")
+            }
+        } catch (e: Exception) {
+            logger.error(ERROR_HEXPIRE_MESSAGE, e)
         }
     }
 
@@ -78,5 +87,6 @@ class EmailCountersApiImpl(
         const val COUNTER_KEY = "email:counters"
         const val ERROR_HSET_MESSAGE = "Error during HSET execution"
         const val ERROR_HEXPIRE_MESSAGE = "Error during HEXPIRE execution"
+        const val ONE = "1"
     }
 }
