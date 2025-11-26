@@ -12,7 +12,7 @@ class EmailServiceTest {
 
     @Test
     fun testService() {
-        for (i in 1..7) {
+        for (i in 1..5) {
             println("Processing email $i")
             emailService.process("gmail.com")
 

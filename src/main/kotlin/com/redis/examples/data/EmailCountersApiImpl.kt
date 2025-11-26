@@ -45,7 +45,7 @@ class EmailCountersApiImpl(
 
             val args = commandArgsFactory.createCommand(keyByteArray, domain, 30)
             val hexpireResult = nativeConnection.dispatch(hExpire, SafeByteArrayOutput(ByteArrayCodec.INSTANCE), args)
-            val hsetSecondResult = nativeConnection.hincrby(keyByteArray, domain.toByteArray(), (newValue + 10).toLong())
+            val hsetSecondResult = nativeConnection.hincrby(keyByteArray, domain.toByteArray(), 1)
 
 
             nativeConnection.flushCommands()
@@ -57,7 +57,6 @@ class EmailCountersApiImpl(
 
             processRedisFutureSync(hsetResult)
             processRedisFutureForExpirationSync(hexpireResult)
-            processRedisFutureSync(hsetSecondResult)
 
             logger.info("Завершили pipeline с командами HSET и HEXPIRE")
             logger.info("Результат при выполнении HEXPIRE: " + hexpireResult.get().decodeToString())

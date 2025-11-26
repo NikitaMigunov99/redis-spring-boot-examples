@@ -16,7 +16,7 @@ class EmailService(
     fun process(domain: String) {
         val counterValue = countersApi.getCounter(domain) ?: 0
 
-        if (counterValue > 100) {
+        if (counterValue > 2) {
             countersApi.setAndExpire(domain, 0)
             logger.info("Обнулили счётчик для домена $domain.")
             return
