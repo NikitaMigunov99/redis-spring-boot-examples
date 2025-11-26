@@ -11,7 +11,7 @@ class CommandArgsFactory {
         val args = CommandArgs(ByteArrayCodec.INSTANCE)
             .addKey(key)
             .add(ttl.toString())
-            .add("FIELDS")
+            .add("F")
             .add("1")
             .add(domain)
         return args
