@@ -60,7 +60,7 @@ class EmailCountersApiImpl(
             processRedisFutureSync(hexpireResult, ERROR_HEXPIRE_MESSAGE)
 
             logger.info("Завершили pipeline с командами HSET и HEXPIRE")
-            logger.info("Результат при выполнении HEXPIRE: " + hexpireResult.get().contentToString())
+            logger.info("Результат при выполнении HEXPIRE: " + hexpireResult.get().decodeToString())
         } catch (e: Exception) {
             logger.error("Ошибка при выполнении команд Redis", e)
         }
