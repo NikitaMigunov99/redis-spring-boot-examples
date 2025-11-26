@@ -2,6 +2,7 @@ package com.redis.examples.data
 
 import com.redis.examples.redis.CommandArgsFactory
 import com.redis.examples.redis.HExpire
+import io.lettuce.core.RedisFuture
 import io.lettuce.core.codec.ByteArrayCodec
 import io.lettuce.core.output.ByteArrayOutput
 import org.slf4j.LoggerFactory
@@ -10,8 +11,6 @@ import org.springframework.data.redis.connection.lettuce.LettuceClusterConnectio
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
-import java.util.concurrent.CompletableFuture
-
 
 
 @Component
@@ -54,15 +53,30 @@ class EmailCountersApiImpl(
 
 
             logger.info("Ждем завершения pipeline с командами HSET и HEXPIRE")
-            logger.info("Результат HSET: " + hsetResult.await(30, java.util.concurrent.TimeUnit.SECONDS))
-            logger.info("Результат HEXPIRE: " + hexpireResult.await(30, java.util.concurrent.TimeUnit.SECONDS))
+//            logger.info("Результат HSET: " + hsetResult.await(30, java.util.concurrent.TimeUnit.SECONDS))
+//            logger.info("Результат HEXPIRE: " + hexpireResult.await(30, java.util.concurrent.TimeUnit.SECONDS))
+
+            processRedisFutureSync(hsetResult, ERROR_HSET_MESSAGE)
+            processRedisFutureSync(hexpireResult, ERROR_HEXPIRE_MESSAGE)
+
             logger.info("Завершили pipeline с командами HSET и HEXPIRE")
+            logger.info("Результат при выполнении HEXPIRE: " + hexpireResult.get().contentToString())
         } catch (e: Exception) {
             logger.error("Ошибка при выполнении команд Redis", e)
         }
     }
 
+    private fun processRedisFutureSync(future: RedisFuture<*>, message: String) {
+        try {
+            future.get(30, java.util.concurrent.TimeUnit.SECONDS)
+        } catch (e: Exception) {
+            logger.error(message, e)
+        }
+    }
+
     private companion object {
         const val COUNTER_KEY = "email:counters"
+        const val ERROR_HSET_MESSAGE = "Error during HSET execution"
+        const val ERROR_HEXPIRE_MESSAGE = "Error during HEXPIRE execution"
     }
 }
