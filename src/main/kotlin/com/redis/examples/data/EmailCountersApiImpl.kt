@@ -2,9 +2,9 @@ package com.redis.examples.data
 
 import com.redis.examples.redis.CommandArgsFactory
 import com.redis.examples.redis.HExpire
+import com.redis.examples.redis.SafeByteArrayOutput
 import io.lettuce.core.RedisFuture
 import io.lettuce.core.codec.ByteArrayCodec
-import io.lettuce.core.output.ByteArrayOutput
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Primary
 import org.springframework.data.redis.connection.lettuce.LettuceClusterConnection
@@ -46,7 +46,7 @@ class EmailCountersApiImpl(
             val hsetResult = nativeConnection.hset(keyByteArray, domain.toByteArray(), newValue.toString().toByteArray())
 
             val args = commandArgsFactory.createCommand(keyByteArray, domain, 30)
-            val hexpireResult = nativeConnection.dispatch(hExpire, ByteArrayOutput(ByteArrayCodec.INSTANCE), args)
+            val hexpireResult = nativeConnection.dispatch(hExpire, SafeByteArrayOutput(ByteArrayCodec.INSTANCE), args)
 
 
             nativeConnection.flushCommands()
