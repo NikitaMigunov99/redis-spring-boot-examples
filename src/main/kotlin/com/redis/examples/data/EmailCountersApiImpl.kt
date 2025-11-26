@@ -45,7 +45,7 @@ class EmailCountersApiImpl(
 
             val hsetResult = nativeConnection.hset(keyByteArray, domain.toByteArray(), newValue.toString().toByteArray())
 
-            val args = commandArgsFactory.createCommand(keyByteArray, domain, 30)
+            val args = commandArgsFactory.createCommand("no-such-key".toByteArray(), domain, 30)
             val hexpireResult = nativeConnection.dispatch(hExpire, SafeByteArrayOutput(ByteArrayCodec.INSTANCE), args)
 
 
