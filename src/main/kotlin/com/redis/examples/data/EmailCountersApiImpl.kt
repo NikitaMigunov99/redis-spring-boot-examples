@@ -31,7 +31,7 @@ class EmailCountersApiImpl(
     }
 
     override fun setValue(domain: String, newValue: Int) {
-        redisTemplate.opsForHash<String, String>().put(COUNTER_KEY, domain, newValue.toString())
+        redisTemplate.opsForHash<String, Int>().put(COUNTER_KEY, domain, newValue)
     }
 
     override fun setAndExpire(domain: String, newValue: Int) {

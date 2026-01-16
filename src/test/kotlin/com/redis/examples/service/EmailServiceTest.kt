@@ -19,5 +19,10 @@ class EmailServiceTest {
             val counter = emailService.getCounter("gmail.com")
             println("Finished processing email $i, counter: $counter")
         }
+        Thread.sleep(5000)
+        println("Setting value without TTL")
+        emailService.setValue("gmail.com", 1000)
+        val value = emailService.getCounter("gmail.com")
+        println("My value $value after setting")
     }
 }

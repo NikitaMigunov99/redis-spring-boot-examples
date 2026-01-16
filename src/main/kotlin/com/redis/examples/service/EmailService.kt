@@ -27,6 +27,10 @@ class EmailService(
         countersApi.setAndExpire(domain, counterValue + 1)
     }
 
+    fun setValue(domain: String, value: Int) {
+        countersApi.setValue(domain, value)
+    }
+
     fun getCounter(domain: String): Int {
         return countersApi.getCounter(domain) ?: 0
     }
