@@ -14,17 +14,18 @@ class EmailService(
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun process(domain: String) {
-        val counterValue = countersApi.getCounter(domain) ?: 0
+        try {
+            val counterValue = countersApi.getCounter(domain) ?: 0
 
-        if (counterValue > 2) {
-            countersApi.setAndExpire(domain, 0)
-            logger.info("Обнулили счётчик для домена $domain.")
-            return
+            if (counterValue > 5) {
+                countersApi.setAndExpire(domain, 0)
+                logger.info("Обнулили счётчик для домена $domain.")
+                return
+            }
+            countersApi.setAndExpire(domain, counterValue + 1)
+        } catch (ex: Exception) {
+            logger.error("Ошибка при выполнении обновления счётчика", ex)
         }
-
-        //sleep(1_000L)
-
-        countersApi.setAndExpire(domain, counterValue + 1)
     }
 
     fun setValue(domain: String, value: Int) {

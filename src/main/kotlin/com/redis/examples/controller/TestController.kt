@@ -17,8 +17,8 @@ class TestController(private val emailService: EmailService) {
     )
 
     @PostMapping("/run")
-    fun runTenTasks() {
-        repeat(15) { index ->
+    fun runTasks() {
+        repeat(7) { index ->
             CompletableFuture.runAsync {
                 emailService.process(domains[index])
             }
