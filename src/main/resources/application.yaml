@@ -8,8 +8,8 @@ logging.level.org.apache.http: DEBUG
 
 redis:
   config:
-    username: your-redis-username
-    password: bitnami
+    username: my-client
+    password: my-password1
     timeout: PT3S  # 3 seconds
     ttl: PT1H      # 1 hour
     nodes:
