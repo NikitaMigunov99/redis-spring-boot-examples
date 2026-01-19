@@ -107,6 +107,7 @@ open class AppConfiguration {
     open fun redisCluster(redisProperties: RedisProperties): RedisClusterConfiguration {
         val config = RedisClusterConfiguration(redisProperties.nodes)
         config.password = RedisPassword.of(redisProperties.password)
+        config.username = redisProperties.username
         return config
     }
 
