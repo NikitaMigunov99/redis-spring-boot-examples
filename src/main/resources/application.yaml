@@ -10,7 +10,7 @@ redis:
   config:
     username: my-client
     password: my-password1
-    timeout: PT3S  # 3 seconds
+    timeout: PT10S  # 10 seconds
     ttl: PT1H      # 1 hour
     nodes:
       - localhost:7001
@@ -22,4 +22,4 @@ redis:
     maxTotalPool: 8
     maxIdlePool: 4
     minIdlePool: 2
-    maxWait: PT5S  # 5 seconds
+    maxWait: PT15S  # 15 seconds
