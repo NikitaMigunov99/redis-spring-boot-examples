@@ -25,7 +25,11 @@ public class RedisProperties {
         poolConfig.setMaxTotal(maxTotalPool);
         poolConfig.setMaxIdle(maxIdlePool);
         poolConfig.setMinIdle(minIdlePool);
-        poolConfig.setMaxWaitMillis(maxWait.toMillis());
+        poolConfig.setMaxWait(maxWait);
+        poolConfig.setTestWhileIdle(true);               // Включить проверку простаивающих соединений перед выдачей клиенту
+        poolConfig.setNumTestsPerEvictionRun(maxIdlePool); // Количество проверяемых соединений за одну итерацию чистки
+        poolConfig.setTimeBetweenEvictionRuns(ttl); // Интервал периодической очистки
+        poolConfig.setSoftMinEvictableIdleDuration(ttl); // Минимальное время простого соединения
         return poolConfig;
     }
 

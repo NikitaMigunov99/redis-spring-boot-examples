@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executors
 
 @RestController
 class TestController(private val emailService: EmailService) {
@@ -19,7 +18,11 @@ class TestController(private val emailService: EmailService) {
 
     @PostMapping("/run")
     fun runTenTasks() {
-        CompletableFuture.runAsync { emailService.process("gmail.com") }
+        repeat(15) { index ->
+            CompletableFuture.runAsync {
+                emailService.process(domains[index])
+            }
+        }
     }
 
     @PostMapping("/set/{domain}")

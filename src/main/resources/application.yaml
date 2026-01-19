@@ -11,7 +11,7 @@ redis:
     username: my-client
     password: my-password1
     timeout: PT10S  # 10 seconds
-    ttl: PT1H      # 1 hour
+    ttl: PT15M      # 15 minutes
     nodes:
       - localhost:7001
       - localhost:7002
