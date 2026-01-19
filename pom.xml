@@ -92,7 +92,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.redis.examples.RedisExamplesApplication</mainClass>
+					<mainClass>com.redis.examples.RedisExamplesApplicationKt</mainClass>
 				</configuration>
 				<executions>
 					<execution>
