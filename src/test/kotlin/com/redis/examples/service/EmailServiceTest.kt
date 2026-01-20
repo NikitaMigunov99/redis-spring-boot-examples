@@ -8,7 +8,7 @@ import java.util.concurrent.Executors
 @SpringBootTest
 class EmailServiceTest {
 
-    private val executor = Executors.newFixedThreadPool(10)
+    private val executor = Executors.newFixedThreadPool(15)
 
     @Autowired
     private lateinit var emailService: EmailService
@@ -32,7 +32,7 @@ class EmailServiceTest {
     @Test
     fun multipleTasks() {
         println("multipleTasks Test")
-        for (i in 1..10) {
+        for (i in 1..15) {
             executor.submit {
                 println("Processing counter: $i")
                 emailService.process("gmail.com")
