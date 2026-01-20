@@ -3,7 +3,7 @@ package com.redis.examples.data
 import com.redis.examples.redis.CommandArgsFactory
 import com.redis.examples.redis.HExpire
 import com.redis.examples.redis.SafeByteArrayOutput
-import io.lettuce.core.api.sync.RedisCommands
+import io.lettuce.core.api.async.BaseRedisAsyncCommands
 import io.lettuce.core.codec.ByteArrayCodec
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Primary
@@ -39,15 +39,20 @@ class EmailCountersApiAlternative(
             val field = redisTemplate.stringSerializer.serialize("myField")
             val value = redisTemplate.stringSerializer.serialize(newValue.toString())
             redisTemplate.executePipelined { connection: RedisConnection ->
-                // HSET key field value
+
                 connection.hSet(key, field, value)
 
-                val commands = connection.nativeConnection as RedisCommands<ByteArray, ByteArray>
+                val nativeConnection = connection.nativeConnection as BaseRedisAsyncCommands<ByteArray, ByteArray>
+                nativeConnection
+                    .dispatch(hExpire, SafeByteArrayOutput(ByteArrayCodec.INSTANCE), args)
+                    .whenComplete { result, throwable ->
+                        if (throwable != null) {
+                            logger.error(ERROR_HEXPIRE_MESSAGE, throwable)
+                        } else if (result != null) {
+                            logger.info("Result of HEXPIRE: " + result.decodeToString())
+                        }
+                    }
 
-                // HEXPIRE key seconds FIELDS 1 field
-
-                val hexpireResult = commands.dispatch(hExpire, SafeByteArrayOutput(ByteArrayCodec.INSTANCE), args)
-                logger.info("Result of HEXPIRE: " + hexpireResult.decodeToString())
                 null
             }
         } catch (e: Exception) {
@@ -56,6 +61,7 @@ class EmailCountersApiAlternative(
     }
 
     private companion object {
+        const val ERROR_HEXPIRE_MESSAGE = "Error during HEXPIRE execution"
         const val COUNTER_KEY = "email:counters"
     }
 }
