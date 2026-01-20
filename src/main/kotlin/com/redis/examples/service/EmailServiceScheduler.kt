@@ -31,13 +31,13 @@ class EmailServiceScheduler(private val emailService: EmailService) {
         } catch (e: Exception) {
             logger.error("Ошибка при обработке домена: $domain", e)
         } finally {
-            counter.incrementAndGet()
+            if (index >= domains.size - 1) {
+                counter.set(0)
+            } else {
+                counter.incrementAndGet()
+            }
         }
 
-        // Обнуляем счётчик, если достигли последнего индекса
-        if (index == domains.size) {
-            counter.set(0)
-        }
         CompletableFuture.runAsync {
             logger.info("Checking for counter ${counter.get()}")
             val value = emailService.getCounter(domain)

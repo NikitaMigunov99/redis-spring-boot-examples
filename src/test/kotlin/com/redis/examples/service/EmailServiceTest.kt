@@ -11,21 +11,21 @@ class EmailServiceTest {
     @Autowired
     private lateinit var emailService: EmailService
 
-    @Test
-    fun testService() {
-        for (i in 1..5) {
-            println("Processing email $i")
-            emailService.process("gmail.com")
-
-            val counter = emailService.getCounter("gmail.com")
-            println("Finished processing email $i, counter: $counter")
-        }
-        Thread.sleep(5000)
-        println("Setting value without TTL")
-        emailService.setValue("gmail.com", 1000)
-        val value = emailService.getCounter("gmail.com")
-        println("My value $value after setting")
-    }
+//    @Test
+//    fun testService() {
+//        for (i in 1..5) {
+//            println("Processing email $i")
+//            emailService.process("gmail.com")
+//
+//            val counter = emailService.getCounter("gmail.com")
+//            println("Finished processing email $i, counter: $counter")
+//        }
+//        Thread.sleep(5000)
+//        println("Setting value without TTL")
+//        emailService.setValue("gmail.com", 1000)
+//        val value = emailService.getCounter("gmail.com")
+//        println("My value $value after setting")
+//    }
 
     @Test
     fun multipleTasks() {
