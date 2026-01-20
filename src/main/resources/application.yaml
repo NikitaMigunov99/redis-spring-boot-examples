@@ -6,7 +6,7 @@ spring:
 redis:
   config:
     username: my-client
-    password: my-password1
+    password: wrong-password
     timeout: PT10S  # 10 seconds
     ttl: PT15M      # 15 minutes
     nodes:
