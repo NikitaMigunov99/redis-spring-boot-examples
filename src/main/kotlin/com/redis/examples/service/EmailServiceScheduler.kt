@@ -3,6 +3,7 @@ package com.redis.examples.service
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicInteger
 
 @Service
@@ -18,7 +19,7 @@ class EmailServiceScheduler(private val emailService: EmailService) {
 
     private val counter = AtomicInteger(0)
 
-    @Scheduled(fixedDelay = 1000) // Каждую секунду
+    @Scheduled(fixedDelay = 500) // Каждые полсекунды
     fun runTaskByScheduler() {
         val index = counter.get()
         val domain = domains[index]
@@ -36,6 +37,11 @@ class EmailServiceScheduler(private val emailService: EmailService) {
         // Обнуляем счётчик, если достигли последнего индекса
         if (index == domains.size) {
             counter.set(0)
+        }
+        CompletableFuture.runAsync {
+            logger.info("Checking for counter ${counter.get()}")
+            val value = emailService.getCounter(domain)
+            logger.info("Value for counter ${counter.get()} is $value")
         }
     }
 }
