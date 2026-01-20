@@ -1,5 +1,6 @@
 package com.redis.examples.data
 
+import com.redis.examples.models.RedisHashSetArguments
 import com.redis.examples.redis.CommandArgsFactory
 import com.redis.examples.redis.HExpire
 import com.redis.examples.redis.SafeByteArrayOutput
@@ -9,12 +10,16 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Primary
 import org.springframework.data.redis.connection.RedisConnection
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.serializer.GenericToStringSerializer
+import org.springframework.data.redis.serializer.StringRedisSerializer
 import org.springframework.stereotype.Component
 
 @Component
 @Primary
 class EmailCountersApiAlternative(
     private val redisTemplate: RedisTemplate<String, Any>,
+    private val stringSerializer: StringRedisSerializer,
+    private val valueSerializer: GenericToStringSerializer<Any>,
     private val commandArgsFactory: CommandArgsFactory
 ) : EmailCountersApi {
 
@@ -35,12 +40,10 @@ class EmailCountersApiAlternative(
         try {
             logger.info("Запускаем pipeline с командами HSET и HEXPIRE")
             val args = commandArgsFactory.createCommand(keyByteArray, domain, 30)
-            val key = redisTemplate.stringSerializer.serialize("myHashKey")
-            val field = redisTemplate.stringSerializer.serialize("myField")
-            val value = redisTemplate.stringSerializer.serialize(newValue.toString())
+            val setArgs = getHashSetArguments(domain, newValue)
             redisTemplate.executePipelined { connection: RedisConnection ->
 
-                connection.hSet(key, field, value)
+                connection.hSet(setArgs.key, setArgs.field, setArgs.value)
 
                 val nativeConnection = connection.nativeConnection as BaseRedisAsyncCommands<ByteArray, ByteArray>
                 nativeConnection
@@ -59,6 +62,13 @@ class EmailCountersApiAlternative(
             logger.error("Ошибка при выполнении команд Redis", e)
         }
     }
+
+    private fun getHashSetArguments(domain: String, newValue: Int) =
+        RedisHashSetArguments(
+            key = keyByteArray,
+            field = stringSerializer.serialize(domain),
+            value = valueSerializer.serialize(newValue)
+        )
 
     private companion object {
         const val ERROR_HEXPIRE_MESSAGE = "Error during HEXPIRE execution"

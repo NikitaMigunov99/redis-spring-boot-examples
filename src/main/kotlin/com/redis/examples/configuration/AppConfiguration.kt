@@ -62,19 +62,29 @@ open class AppConfiguration {
 
     @Bean
     @Primary
-    open fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
+    open fun redisTemplate(
+        redisConnectionFactory: RedisConnectionFactory,
+        stringSerializer: StringRedisSerializer,
+        valueSerializer: GenericToStringSerializer<Any>
+    ): RedisTemplate<String, Any> {
         val template = RedisTemplate<String, Any>()
         template.connectionFactory = redisConnectionFactory
 
-        template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = GenericToStringSerializer(Any::class.java)
+        template.keySerializer = stringSerializer
+        template.valueSerializer = valueSerializer
 
-        template.hashKeySerializer = StringRedisSerializer()
-        template.hashValueSerializer = GenericToStringSerializer(Any::class.java)
+        template.hashKeySerializer = stringSerializer
+        template.hashValueSerializer = valueSerializer
 
         template.afterPropertiesSet()
         return template
     }
+
+    @Bean
+    open fun valueSerializer() = GenericToStringSerializer(Any::class.java)
+
+    @Bean
+    open fun stringSerializer() = StringRedisSerializer()
 
     @Bean
     open fun updateAndSetTTL(): RedisScript<String> {
