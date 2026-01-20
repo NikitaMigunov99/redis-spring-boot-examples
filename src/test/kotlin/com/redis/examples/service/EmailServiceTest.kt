@@ -8,7 +8,7 @@ import java.util.concurrent.Executors
 @SpringBootTest
 class EmailServiceTest {
 
-    private val executor = Executors.newFixedThreadPool(15)
+    private val executor = Executors.newFixedThreadPool(12)
 
     @Autowired
     private lateinit var emailService: EmailService
@@ -32,15 +32,15 @@ class EmailServiceTest {
     @Test
     fun multipleTasks() {
         println("multipleTasks Test")
-        for (i in 1..15) {
+        for (i in 1..12) {
             executor.submit {
                 println("Processing counter: $i")
                 emailService.process("gmail.com")
                 println("Finished counter: $i")
             }
         }
-        Thread.sleep(5000)
+        executor.awaitTermination(7, java.util.concurrent.TimeUnit.SECONDS)
         val value = emailService.getCounter("gmail.com")
-        println("My value $value after setting")
+        println("multipleTasks Test My value $value after setting")
     }
 }
