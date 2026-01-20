@@ -38,8 +38,9 @@ class EmailServiceTest {
                 println("Finished counter: $i")
             }
         }
+        println("await termination")
+        Thread.sleep(10000)
         executor.shutdown()
-        executor.awaitTermination(15, java.util.concurrent.TimeUnit.SECONDS)
         val value = emailService.getCounter("gmail.com")
         println("multipleTasks Test My value $value after setting")
     }
