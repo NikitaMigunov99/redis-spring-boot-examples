@@ -4,6 +4,7 @@ import com.redis.examples.data.EmailCountersApi
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.lang.Thread.sleep
+import java.util.concurrent.atomic.AtomicInteger
 
 
 @Service
@@ -13,11 +14,14 @@ class EmailService(
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
+    private val counter = AtomicInteger(0)
+
     fun process(domain: String) {
         try {
-            val counterValue = countersApi.getCounter(domain) ?: 0
+            val counterValue = counter.get()
 
             if (counterValue > 7) {
+                counter.set(0)
                 countersApi.setAndExpire(domain, 0)
                 logger.info("Обнулили счётчик для домена $domain.")
                 return
