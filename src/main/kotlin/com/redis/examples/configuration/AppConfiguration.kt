@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator
 import com.redis.examples.models.User
 import io.lettuce.core.ClientOptions
+import io.lettuce.core.TimeoutOptions
 import io.lettuce.core.resource.ClientResources
 import io.lettuce.core.resource.DefaultClientResources
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -23,6 +25,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.GenericToStringSerializer
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import java.time.Duration
 
 
 @Configuration
@@ -86,18 +89,20 @@ open class AppConfiguration {
     open fun clientOptions(): ClientOptions =
         ClientOptions
             .builder()
+            .timeoutOptions(TimeoutOptions.builder().fixedTimeout(Duration.ofSeconds(10)).build())
             .disconnectedBehavior(ClientOptions.DisconnectedBehavior.DEFAULT)
             .autoReconnect(true)
             .build()
 
     @Bean
     open fun lettuceConfiguration(
+        @Value("\${spring.application.name}") name: String,
         clientOptions: ClientOptions,
         clientResources: ClientResources,
         redisProperties: RedisProperties
     ): LettucePoolingClientConfiguration =
         LettucePoolingClientConfiguration.builder()
-            .clientName(redisProperties.username)
+            .clientName(name)
             .clientOptions(clientOptions)
             .clientResources(clientResources)
             .poolConfig(redisProperties.getGenericObjectPoolConfig<Any>())

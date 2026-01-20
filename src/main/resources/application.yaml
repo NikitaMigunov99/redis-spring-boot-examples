@@ -2,9 +2,6 @@ spring:
   application:
     name: redis-examples
 
-logging.level.io.lettuce: DEBUG
-logging.level.org.apache.http: DEBUG
-
 
 redis:
   config:
@@ -22,4 +19,3 @@ redis:
     maxTotalPool: 8
     maxIdlePool: 4
     minIdlePool: 2
-    maxWait: PT15S  # 15 seconds
