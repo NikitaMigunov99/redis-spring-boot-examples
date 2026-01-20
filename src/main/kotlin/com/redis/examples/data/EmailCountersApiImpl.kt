@@ -6,7 +6,6 @@ import com.redis.examples.redis.SafeByteArrayOutput
 import io.lettuce.core.RedisFuture
 import io.lettuce.core.codec.ByteArrayCodec
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Primary
 import org.springframework.data.redis.connection.lettuce.LettuceClusterConnection
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component
 
 
 @Component
-@Primary
 class EmailCountersApiImpl(
     private val redisTemplate: RedisTemplate<String, Any>,
     private val connectionFactory: LettuceConnectionFactory,
