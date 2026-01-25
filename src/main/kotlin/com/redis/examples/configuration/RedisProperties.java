@@ -9,6 +9,8 @@ import java.util.List;
 @ConfigurationProperties(prefix = "redis.config")
 public class RedisProperties {
 
+    private String master;
+    private String sentinelPassword;
     private String username;
     private String password;
     private Duration timeout;
@@ -39,6 +41,22 @@ public class RedisProperties {
 
     public void setMaxTotalPool(int maxTotalPool) {
         this.maxTotalPool = maxTotalPool;
+    }
+
+    public String getMaster() {
+        return master;
+    }
+
+    public void setMaster(String master) {
+        this.master = master;
+    }
+
+    public String getSentinelPassword() {
+        return sentinelPassword;
+    }
+
+    public void setSentinelPassword(String sentinelPassword) {
+        this.sentinelPassword = sentinelPassword;
     }
 
     public String getUsername() {

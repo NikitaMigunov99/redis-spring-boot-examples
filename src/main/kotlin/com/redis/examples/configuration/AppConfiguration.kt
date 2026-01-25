@@ -16,12 +16,13 @@ import org.springframework.context.annotation.Primary
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.redis.connection.RedisClusterConfiguration
 import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.connection.RedisNode
 import org.springframework.data.redis.connection.RedisPassword
+import org.springframework.data.redis.connection.RedisSentinelConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.GenericToStringSerializer
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
@@ -119,11 +120,21 @@ open class AppConfiguration {
             .build()
 
     @Bean
-    open fun redisCluster(redisProperties: RedisProperties): RedisClusterConfiguration {
-        val config = RedisClusterConfiguration(redisProperties.nodes)
-        config.password = RedisPassword.of(redisProperties.password)
-        config.username = redisProperties.username
-        return config
+    open fun redisSentinelConfig(redisProperties: RedisProperties): RedisSentinelConfiguration {
+        val sentinelConfig = RedisSentinelConfiguration()
+            .apply {
+                master(redisProperties.master)
+                sentinelPassword = RedisPassword.of(redisProperties.sentinelPassword)
+
+                username = redisProperties.username
+                password = RedisPassword.of(redisProperties.password)
+
+                redisProperties.nodes.forEach { node ->
+                    val (host, port) = node.split(":")
+                    addSentinel(RedisNode(host, port.toInt()))
+                }
+            }
+        return sentinelConfig
     }
 
     @Bean
@@ -135,5 +146,4 @@ open class AppConfiguration {
         factory.afterPropertiesSet()
         return factory
     }
-
 }
