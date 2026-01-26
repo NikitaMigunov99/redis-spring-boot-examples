@@ -6,7 +6,7 @@ spring:
 redis:
   config:
     master: mymaster
-    sentinel-password: my-sentinel-password
+    sentinel-password: wrong-sentinel-password
     username: my-client
     password: my-password1
     timeout: PT10S  # 10 seconds
