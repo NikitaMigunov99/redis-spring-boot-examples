@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.core.io.ClassPathResource
-import org.springframework.data.redis.connection.RedisClusterConfiguration
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.RedisNode
 import org.springframework.data.redis.connection.RedisPassword
@@ -139,10 +138,10 @@ open class AppConfiguration {
 
     @Bean
     open fun lettuceConnectionFactory(
-        clusterConfiguration: RedisClusterConfiguration,
+        sentinelConfiguration: RedisSentinelConfiguration,
         clientConfiguration: LettucePoolingClientConfiguration
     ): RedisConnectionFactory {
-        val factory = LettuceConnectionFactory(clusterConfiguration, clientConfiguration)
+        val factory = LettuceConnectionFactory(sentinelConfiguration, clientConfiguration)
         factory.afterPropertiesSet()
         return factory
     }
