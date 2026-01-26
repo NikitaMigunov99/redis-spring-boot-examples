@@ -12,9 +12,9 @@ redis:
     timeout: PT10S  # 10 seconds
     ttl: PT15M      # 15 minutes
     nodes:
-      - sentinel-1:26379
-      - sentinel-2:26379
-      - sentinel-3:26379
+      - localhost:26379
+      - localhost:26380
+      - localhost:26381
     maxTotalPool: 8
     maxIdlePool: 4
     minIdlePool: 2
