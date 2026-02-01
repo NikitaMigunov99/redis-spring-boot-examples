@@ -1,6 +1,8 @@
 package com.redis.examples.service
 
 import com.redis.examples.data.EmailCountersApi
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Timer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.lang.Thread.sleep
@@ -8,23 +10,41 @@ import java.lang.Thread.sleep
 
 @Service
 class EmailService(
-    private val countersApi: EmailCountersApi
+    private val countersApi: EmailCountersApi,
+    private val registry: MeterRegistry
 ) {
+
+    private val sendEmailTimer = Timer.builder("email.process.sending")
+        .description("Time spent sending an email")
+        .publishPercentileHistogram()
+        .register(registry);
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun process(domain: String) {
+        val totalTime = Timer.start(registry)
         try {
+
             val counterValue = countersApi.getCounter(domain) ?: 0
 
             if (counterValue > 7) {
-                countersApi.setAndExpire(domain, 0)
+                countersApi.setValue(domain, 0)
                 logger.info("Обнулили счётчик для домена $domain.")
-                return
+            } else {
+                val sendingTime = Timer.start(registry)
+                sleep(200) // mock of email sending
+                sendingTime.stop(sendEmailTimer)
+                countersApi.setAndExpire(domain, counterValue + 1)
             }
-            countersApi.setAndExpire(domain, counterValue + 1)
+            totalTime.stop(Timer.builder("email.process.total")
+                .tag("success", "true")
+                .register(registry))
         } catch (ex: Exception) {
             logger.error("Ошибка при выполнении обновления счётчика", ex)
+            totalTime.stop(Timer.builder("email.process.total")
+                .tag("success", "false")
+                .tag("exception", ex.javaClass.simpleName)
+                .register(registry))
         }
     }
 

@@ -1,7 +1,17 @@
 spring:
   application:
     name: redis-examples
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+#    enable:
+#      jvm: false
+#      process: false
+    tags:
+      application: spring-demo
 
 redis:
   config:
