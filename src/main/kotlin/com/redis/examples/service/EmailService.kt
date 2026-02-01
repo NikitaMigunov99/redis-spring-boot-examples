@@ -22,6 +22,7 @@ class EmailService(
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun process(domain: String) {
+        val start = System.nanoTime()
         val totalTime = Timer.start(registry)
         try {
 
@@ -45,6 +46,9 @@ class EmailService(
                 .tag("success", "false")
                 .tag("exception", ex.javaClass.simpleName)
                 .register(registry))
+        } finally {
+            val durationMs = (System.nanoTime() - start) / 1_000_000
+            logger.info("Время выполнения: $durationMs мс.")
         }
     }
 
