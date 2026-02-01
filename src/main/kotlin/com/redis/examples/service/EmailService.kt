@@ -16,7 +16,6 @@ class EmailService(
 
     private val sendEmailTimer = Timer.builder("email.process.sending")
         .description("Time spent sending an email")
-        .publishPercentileHistogram()
         .register(registry);
 
     private val logger = LoggerFactory.getLogger(this::class.java)
