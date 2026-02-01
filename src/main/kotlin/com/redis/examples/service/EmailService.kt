@@ -30,15 +30,20 @@ class EmailService(
             if (counterValue > 7) {
                 countersApi.setValue(domain, 0)
                 logger.info("Обнулили счётчик для домена $domain.")
+                totalTime.stop(Timer.builder("email.process.total")
+                    .tag("success", "true")
+                    .tag("sending", "false")
+                    .register(registry))
             } else {
                 val sendingTime = Timer.start(registry)
                 sleep(200) // mock of email sending
                 sendingTime.stop(sendEmailTimer)
                 countersApi.setAndExpire(domain, counterValue + 1)
+                totalTime.stop(Timer.builder("email.process.total")
+                    .tag("success", "true")
+                    .tag("sending", "true")
+                    .register(registry))
             }
-            totalTime.stop(Timer.builder("email.process.total")
-                .tag("success", "true")
-                .register(registry))
         } catch (ex: Exception) {
             logger.error("Ошибка при выполнении обновления счётчика", ex)
             totalTime.stop(Timer.builder("email.process.total")
