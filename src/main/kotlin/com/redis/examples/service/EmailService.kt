@@ -35,8 +35,10 @@ class EmailService(
                     .tag("sending", "false")
                     .register(registry))
             } else {
+                val delay = (100L..300L).random()
+                println("Случайная задержка: $delay мс")
                 val sendingTime = Timer.start(registry)
-                sleep(200) // mock of email sending
+                sleep(delay) // mock of email sending
                 sendingTime.stop(sendEmailTimer)
                 countersApi.setAndExpire(domain, counterValue + 1)
                 totalTime.stop(Timer.builder("email.process.total")
