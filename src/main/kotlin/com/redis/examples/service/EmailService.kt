@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Timer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.lang.Thread.sleep
+import java.util.concurrent.TimeUnit
 
 
 @Service
@@ -35,7 +36,7 @@ class EmailService(
                     .tag("sending", "false")
                     .register(registry))
             } else {
-                val delay = (100L..300L).random()
+                val delay = (150L..250L).random()
                 println("Случайная задержка: $delay мс")
                 val sendingTime = Timer.start(registry)
                 sleep(delay) // mock of email sending
@@ -54,6 +55,7 @@ class EmailService(
                 .register(registry))
         } finally {
             val durationMs = (System.nanoTime() - start) / 1_000_000
+            registry.timer("email.process.latency").record(durationMs, TimeUnit.MILLISECONDS)
             logger.info("Время выполнения: $durationMs мс.")
         }
     }
