@@ -6,6 +6,7 @@ spring:
 redis:
   config:
     master: mymaster
+    sentinel-username: sentinel-username
     sentinel-password: wrong-sentinel-password
     username: my-client
     password: my-password1

@@ -10,6 +10,7 @@ import java.util.List;
 public class RedisProperties {
 
     private String master;
+    private String sentinelUsername;
     private String sentinelPassword;
     private String username;
     private String password;
@@ -49,6 +50,14 @@ public class RedisProperties {
 
     public void setMaster(String master) {
         this.master = master;
+    }
+
+    public String getSentinelUsername() {
+        return sentinelUsername;
+    }
+
+    public void setSentinelUsername(String sentinelUsername) {
+        this.sentinelUsername = sentinelUsername;
     }
 
     public String getSentinelPassword() {

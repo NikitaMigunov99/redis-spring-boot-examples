@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator
 import com.redis.examples.models.User
+import com.redis.examples.redis.SentinelAuthLettuceConnectionFactory
 import io.lettuce.core.ClientOptions
 import io.lettuce.core.TimeoutOptions
 import io.lettuce.core.resource.ClientResources
@@ -138,10 +139,16 @@ open class AppConfiguration {
 
     @Bean
     open fun lettuceConnectionFactory(
+        redisProperties: RedisProperties,
         sentinelConfiguration: RedisSentinelConfiguration,
         clientConfiguration: LettucePoolingClientConfiguration
     ): RedisConnectionFactory {
-        val factory = LettuceConnectionFactory(sentinelConfiguration, clientConfiguration)
+        val factory = SentinelAuthLettuceConnectionFactory(
+            sentinelConfiguration,
+            redisProperties.sentinelUsername,
+            redisProperties.sentinelPassword,
+            clientConfiguration
+        )
         factory.afterPropertiesSet()
         return factory
     }
