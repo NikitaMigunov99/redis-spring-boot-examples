@@ -63,6 +63,18 @@ class RedisExamplesApplicationTests {
         } catch (e: Exception) {
             println("My string Object is not a number: $e")
         }
+
+        try {
+            println("Set number to hash")
+            redisTemplate.opsForHash<String, Int>().put("counter:map", "field",5)
+            val counter = redisTemplate.opsForHash<String, String>().get("counter:map", "field")
+            println("The counter is $counter")
+
+            val counterInt = redisTemplate.opsForHash<String, Int>().get("counter:map", "field")
+            println("The int counter is $counterInt")
+        } catch (e: Exception) {
+            println("Error with the map :$e")
+        }
     }
 
     @Test
