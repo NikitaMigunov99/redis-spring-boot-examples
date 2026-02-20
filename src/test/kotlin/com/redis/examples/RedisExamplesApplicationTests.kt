@@ -12,7 +12,7 @@ class RedisExamplesApplicationTests {
     @Autowired
     private lateinit var redisTemplate: RedisTemplate<String, Any>
 
-    //@Test
+    @Test
     fun testTemplate() {
         val randomNumber = (1..500).random()
         println("Random number is $randomNumber")
